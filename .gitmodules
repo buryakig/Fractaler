@@ -1,0 +1,3 @@
+[submodule "ImApp"]
+	path = ImApp
+	url = https://github.com/buryakig/ImApp
