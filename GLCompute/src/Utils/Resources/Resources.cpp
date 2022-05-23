@@ -6,9 +6,9 @@
 
 std::vector<Shader*>	Resources::shaders = {};
 std::vector<Texture*>	Resources::textures = {};
-std::vector<ComputeShader*>	Resources::computeShaders = {};
+std::vector<std::shared_ptr<ComputeShader>>	Resources::computeShaders = {};
 
-ComputeShader* Resources::LoadComputeShader(const char* csPath)
+std::shared_ptr<ComputeShader> Resources::LoadComputeShader(const char* csPath)
 {
 	std::string csCode;
 	std::ifstream csFile;
@@ -68,7 +68,7 @@ ComputeShader* Resources::LoadComputeShader(const char* csPath)
 	// delete the shaders as they're linked into our program now and no longer necessary
 	glDeleteShader(compute);
 
-	computeShaders.push_back(new ComputeShader(programID));
+	computeShaders.emplace_back(new ComputeShader(programID));
 
 	return computeShaders.back();
 }
@@ -211,6 +211,5 @@ void Resources::DeallocateMemory()
 {
 	for (auto shader : shaders)	delete shader;
 	for (auto texture : textures)	delete texture;
-	for (auto computeShader : computeShaders)	delete computeShader;
 }
 
