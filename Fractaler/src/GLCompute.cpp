@@ -23,7 +23,7 @@ public:
 	{
 		mainTex = std::unique_ptr<RenderTexture>(new RenderTexture(0, 0));
 
-		testCompute = Resources::LoadComputeShader("GLCompute/res/ComputeShaders/test.compute");
+		testCompute = Resources::LoadComputeShader("Fractaler/res/ComputeShaders/test.compute");
 	
 		glUniform1i(glGetUniformLocation(testCompute->programID, "destTex"), 0);
 	}
@@ -103,7 +103,7 @@ public:
 ImApp::Application* ImApp::CreateApplication(int argc, char** argv)
 {
 	ImApp::ApplicationSpecification spec;
-	spec.Name = "GLCompute";
+	spec.Name = "Fractaler";
 	spec.Width = 1280;
 	spec.Height = 900;
 
