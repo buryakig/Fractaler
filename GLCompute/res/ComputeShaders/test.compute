@@ -1,14 +1,49 @@
 #version 450
-uniform float roll;
-layout (binding = 0, rgba16f) uniform image2D destTex;
+
+uniform float mandelModule;
+uniform vec4 viewSize;
+
+layout (binding = 0, rgba32f) uniform image2D destTex;
 layout (local_size_x = 16, local_size_y = 16) in;
+
+
+#define MAX_ITERATIONS 100
+#define GRADIENT_ITERATIONS 25
+
+uniform uint Width = 1024;
+uniform uint Height = 1024;
+
+uint mandelbrot(vec2 c)
+{
+    vec2 z = vec2(0.0, 0.0);
+    
+    uint i = 0;
+    while (i < MAX_ITERATIONS && (z.x * z.x + z.y * z.y) < mandelModule)
+    {
+        z = vec2(z.x * z.x - z.y * z.y + c.x, 2 * z.x * z.y + c.y);
+        ++i;
+    }
+    return i;
+}
+
+
 void main()
 {
+    vec2 screenCoords = gl_GlobalInvocationID.xy;
+    screenCoords.y = viewSize.y - gl_GlobalInvocationID.y;
+    vec2 c = vec2(screenCoords - 0.5 * viewSize.xy) * 4.0 / min(viewSize.x, viewSize.y);
+    //c.y = 1.0 - c.y;
+    
+    uint i = mandelbrot(c);
+    vec4 color = vec4(0.0, 0.5, 0.5, 1);
+    if (i < GRADIENT_ITERATIONS)
+    {
+        color = vec4(float(i) * 2 / GRADIENT_ITERATIONS, 0.2, 0.0, 1);
+    }
+    else
+        color = vec4(0, 0, 0, 1);
+    
     ivec2 storePos = ivec2(gl_GlobalInvocationID.xy);
-    
-    float localCoef = length(vec2(ivec2(gl_LocalInvocationID.xy) - 8) / 8.0);
-    
-    float globalCoef = sin(float(gl_WorkGroupID.x + gl_WorkGroupID.y) * 0.1 + roll) * 0.5;
-    
-    imageStore(destTex, storePos, vec4(vec2(1.0 - globalCoef * localCoef), 1.0, 1.0));
+    imageStore(destTex, storePos, color);
+    //imageStore(destTex, storePos, vec4(c, 0.0, 1.0));
 }

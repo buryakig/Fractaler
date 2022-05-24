@@ -5,6 +5,7 @@ class Texture
 {
 public:
 	Texture() = default;
+	Texture(int w, int h) : width(w), height(h) {}
 	~Texture();
 
 
